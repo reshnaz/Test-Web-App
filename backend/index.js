@@ -7,7 +7,6 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
-app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
@@ -24,6 +23,8 @@ app.get('/', (req, res) => {
 
 // Import auth routes and mount under /api/auth
 app.use('/api/auth', require('./routes/auth'));
+// import and use tasks routes:
+app.use('/api/tasks', require('./routes/tasks'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
