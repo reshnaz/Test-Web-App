@@ -1,19 +1,26 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import Spinner from '../components/Spinner';
 
 export default function Dashboard() {
   const { token, logout } = useContext(AuthContext);
 
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  
+  const [adding, setAdding] = useState(false);
+
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editStatus, setEditStatus] = useState('pending');
+  const [saving, setSaving] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -22,10 +29,12 @@ export default function Dashboard() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('http://localhost:3000/api/tasks', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('search', searchTerm);
+        if (filterStatus) params.append('status', filterStatus);
+
+        const res = await fetch(`http://localhost:3000/api/tasks?${params.toString()}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Failed to fetch tasks');
@@ -38,12 +47,12 @@ export default function Dashboard() {
     }
 
     fetchTasks();
-  }, [token]);
+  }, [token, searchTerm, filterStatus]);
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
-
+    setAdding(true);
     try {
       const res = await fetch('http://localhost:3000/api/tasks', {
         method: 'POST',
@@ -61,6 +70,8 @@ export default function Dashboard() {
       setDescription('');
     } catch (err) {
       alert(err.message);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -69,9 +80,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`http://localhost:3000/api/tasks/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
         const data = await res.json();
@@ -95,6 +104,7 @@ export default function Dashboard() {
   };
 
   const saveEditing = async () => {
+    setSaving(true);
     try {
       const res = await fetch(`http://localhost:3000/api/tasks/${editingTaskId}`, {
         method: 'PUT',
@@ -115,6 +125,8 @@ export default function Dashboard() {
       setEditingTaskId(null);
     } catch (err) {
       alert(err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -138,6 +150,7 @@ export default function Dashboard() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+          disabled={adding}
         />
         <input
           className="border p-2 mr-2 rounded w-3/5"
@@ -145,19 +158,41 @@ export default function Dashboard() {
           placeholder="Task description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          disabled={adding}
         />
         <button
           type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          disabled={adding}
+          className={`bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ${adding ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Add Task
+          {adding ? 'Adding...' : 'Add Task'}
         </button>
       </form>
 
+      <div className="mb-6 flex space-x-4">
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border p-2 rounded w-1/2"
+        />
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="border p-2 rounded w-1/3"
+        >
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="in-progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+
       {loading ? (
-        <p>Loading tasks...</p>
+        <Spinner />
       ) : error ? (
-        <p className="text-red-600">{error}</p>
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">{error}</div>
       ) : tasks.length === 0 ? (
         <p>No tasks found</p>
       ) : (
@@ -174,6 +209,7 @@ export default function Dashboard() {
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     className="border p-2 w-full mb-2 rounded"
+                    disabled={saving}
                   />
                   <input
                     type="text"
@@ -181,11 +217,13 @@ export default function Dashboard() {
                     onChange={(e) => setEditDescription(e.target.value)}
                     className="border p-2 w-full mb-2 rounded"
                     placeholder="Description (optional)"
+                    disabled={saving}
                   />
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
                     className="border p-2 w-full rounded"
+                    disabled={saving}
                   >
                     <option value="pending">Pending</option>
                     <option value="in-progress">In Progress</option>
@@ -207,12 +245,14 @@ export default function Dashboard() {
                   <>
                     <button
                       onClick={saveEditing}
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                      disabled={saving}
+                      className={`bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      Save
+                      {saving ? 'Saving...' : 'Save'}
                     </button>
                     <button
                       onClick={cancelEditing}
+                      disabled={saving}
                       className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
                     >
                       Cancel
