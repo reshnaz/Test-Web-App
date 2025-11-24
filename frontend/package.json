@@ -1,4 +1,9 @@
 {
+  "name": "frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
     "react-router-dom": "^7.9.6"
