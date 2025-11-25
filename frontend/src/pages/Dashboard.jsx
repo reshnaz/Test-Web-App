@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
   const { token, logout } = useContext(AuthContext);
@@ -134,12 +135,17 @@ export default function Dashboard() {
     <div className="max-w-3xl mx-auto mt-8 p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Your Tasks</h1>
+        <div className="space-x-4">
+        <Link to="/profile" className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+      Profile
+    </Link>
         <button
           onClick={logout}
           className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
           Logout
         </button>
+        </div>
       </div>
 
       <form onSubmit={handleAddTask} className="mb-6">
