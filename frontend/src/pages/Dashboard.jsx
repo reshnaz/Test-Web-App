@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
 import { Link } from 'react-router-dom';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 
 export default function Dashboard() {
   const { token, logout } = useContext(AuthContext);
@@ -133,24 +134,24 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-3xl mx-auto mt-8 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Your Tasks</h1>
-        <div className="space-x-4">
-        <Link to="/profile" className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-      Profile
-    </Link>
-        <button
-          onClick={logout}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Logout
-        </button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+        <h1 className="text-3xl font-bold mb-4 sm:mb-0">Your Tasks</h1>
+        <div className="space-x-0 sm:space-x-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 w-full sm:w-auto">
+          <Link to="/profile" className="bg-gray-600 text-white px-5 py-2 rounded hover:bg-gray-700 text-center">
+            Profile
+          </Link>
+          <button
+            onClick={logout}
+            className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
-      <form onSubmit={handleAddTask} className="mb-6">
+      <form onSubmit={handleAddTask} className="mb-8 flex flex-wrap space-x-0 sm:space-x-3 space-y-3 sm:space-y-0">
         <input
-          className="border p-2 mr-2 rounded w-2/5"
+          className="mb-2 border p-2 rounded w-full sm:w-3/5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
           placeholder="Task title"
           value={title}
@@ -159,7 +160,7 @@ export default function Dashboard() {
           disabled={adding}
         />
         <input
-          className="border p-2 mr-2 rounded w-3/5"
+          className="border p-2 rounded w-full sm:w-3/5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
           placeholder="Task description (optional)"
           value={description}
@@ -169,24 +170,27 @@ export default function Dashboard() {
         <button
           type="submit"
           disabled={adding}
-          className={`bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ${adding ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full sm:w-auto ${adding ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {adding ? 'Adding...' : 'Add Task'}
         </button>
       </form>
 
-      <div className="mb-6 flex space-x-4">
-        <input
-          type="text"
-          placeholder="Search tasks..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded w-1/2"
-        />
+      <div className="mb-8 flex flex-col sm:flex-row space-x-0 sm:space-x-4 space-y-3 sm:space-y-0">
+      <div className="relative w-full sm:w-1/2">
+      <input
+      type="text"
+      placeholder="Search tasks..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="border p-2 pr-10 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      />
+      <MagnifyingGlassIcon className="absolute top-1/2 right-3 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+      </div>
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="border p-2 rounded w-1/3"
+          className="border p-2 rounded w-full sm:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">All statuses</option>
           <option value="pending">Pending</option>
@@ -206,29 +210,29 @@ export default function Dashboard() {
           {tasks.map((task) => (
             <li
               key={task._id}
-              className="mb-4 p-4 border rounded flex justify-between items-center"
+              className="mb-5 p-5 border rounded shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center"
             >
               {editingTaskId === task._id ? (
-                <div className="flex-1 mr-4">
+                <div className="flex-1 mr-0 sm:mr-4 mb-4 sm:mb-0 w-full sm:w-auto">
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="border p-2 w-full mb-2 rounded"
+                    className="border p-2 w-full mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={saving}
                   />
                   <input
                     type="text"
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="border p-2 w-full mb-2 rounded"
+                    className="border p-2 w-full mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Description (optional)"
                     disabled={saving}
                   />
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="border p-2 w-full rounded"
+                    className="border p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={saving}
                   >
                     <option value="pending">Pending</option>
@@ -237,29 +241,29 @@ export default function Dashboard() {
                   </select>
                 </div>
               ) : (
-                <div className="flex-1 mr-4">
-                  <h3 className="font-semibold">{task.title}</h3>
+                <div className="flex-1 mr-0 sm:mr-4 mb-4 sm:mb-0 w-full sm:w-auto">
+                  <h3 className="font-semibold mb-2">{task.title}</h3>
                   {task.description && (
-                    <p className="text-gray-600">{task.description}</p>
+                    <p className="text-gray-600 mb-1">{task.description}</p>
                   )}
-                  <p className="text-sm italic">Status: {task.status}</p>
+                  <p className="text-sm italic text-gray-500">Status: {task.status}</p>
                 </div>
               )}
 
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap justify-start sm:justify-end items-center space-x-0 sm:space-x-3 space-y-0 sm:space-y-0 w-full sm:w-auto">
                 {editingTaskId === task._id ? (
                   <>
                     <button
                       onClick={saveEditing}
                       disabled={saving}
-                      className={`bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 cursor-pointer ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {saving ? 'Saving...' : 'Save'}
                     </button>
                     <button
                       onClick={cancelEditing}
                       disabled={saving}
-                      className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+                      className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500 cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -268,13 +272,13 @@ export default function Dashboard() {
                   <>
                     <button
                       onClick={() => startEditing(task)}
-                      className="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700"
+                      className="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 cursor-pointer"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(task._id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 cursor-pointer"
                     >
                       Delete
                     </button>
