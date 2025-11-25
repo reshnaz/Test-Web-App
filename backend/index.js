@@ -16,11 +16,8 @@ mongoose.connect(process.env.MONGO_URI)
   });
 
 // Test route to verify server is running
-// app.get('/', (req, res) => {
-//   res.send('Backend is running!');
-// });
-app.get('/api/profile', (req, res) => {
-  res.json({ message: 'Profile route working' });
+app.get('/', (req, res) => {
+  res.send('Backend is running!');
 });
 
 // Import auth routes and mount under /api/auth

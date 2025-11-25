@@ -7,7 +7,7 @@ const User = require('../models/User');
 router.get('/', auth, async (req, res) => {
   try {
     // req.user contains userId from token payload set by auth middleware
-    const user = await User.findById(req.user.userId).select('-password'); // exclude password
+    const user = await User.findById(req.user.id).select('-password'); // exclude password
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     res.json(user);
@@ -26,7 +26,7 @@ router.put('/', auth, async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     // Check if email already exists for another user

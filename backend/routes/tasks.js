@@ -46,6 +46,17 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/tasks/:id - get single task by id
+router.get('/:id', async (req, res) => {
+  try {
+    const task = await Task.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // PUT /api/tasks/:id - update a task
 router.put('/:id', async (req, res) => {
   const { title, description, status } = req.body;
