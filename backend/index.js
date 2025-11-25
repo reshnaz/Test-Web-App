@@ -1,4 +1,3 @@
-// backend/index.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -17,14 +16,18 @@ mongoose.connect(process.env.MONGO_URI)
   });
 
 // Test route to verify server is running
-app.get('/', (req, res) => {
-  res.send('Backend is running!');
+// app.get('/', (req, res) => {
+//   res.send('Backend is running!');
+// });
+app.get('/api/profile', (req, res) => {
+  res.json({ message: 'Profile route working' });
 });
 
 // Import auth routes and mount under /api/auth
 app.use('/api/auth', require('./routes/auth'));
 // import and use tasks routes:
 app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/profile', require('./routes/profile'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
